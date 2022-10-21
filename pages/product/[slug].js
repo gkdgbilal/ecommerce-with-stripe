@@ -2,10 +2,18 @@ import React, { useState } from 'react'
 import { AiOutlineMinus, AiOutlinePlus, AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { Product } from '../../components';
 import { client, urlFor } from '../../lib/client'
+import { useStateContext } from '../../context/StateContext'
 
 const ProductDetails = ({ product, products }) => {
   const { name, details, price, image } = product
   const [index, setIndex] = useState(0)
+
+  const { qty, incQty, decQty, onAdd, setShowCart } = useStateContext()
+
+  const handleBuyNow = () => {
+    onAdd(product, qty)
+    setShowCart(true)
+  }
 
   return (
     <div>
@@ -49,17 +57,16 @@ const ProductDetails = ({ product, products }) => {
             <h3>Quantity:</h3>
             <p className='quantity-desc'>
               <span className='minus'
-              // onClick=""
+                onClick={decQty}
               >
                 <AiOutlineMinus />
               </span>
               <span className='num'
-              // onClick=""
               >
-                0
+                {qty}
               </span>
               <span className='plus'
-              // onClick=""
+                onClick={incQty}
               >
                 <AiOutlinePlus />
               </span>
@@ -67,10 +74,10 @@ const ProductDetails = ({ product, products }) => {
           </div>
           <div className='buttons'>
             <button type='button' className='add-to-cart'
-            // onClick=""
+              onClick={() => onAdd(product, qty)}
             >Add to Cart</button>
             <button type='button' className='buy-now'
-            // onClick=""
+              onClick={handleBuyNow}
             >Buy Now</button>
           </div>
         </div>
@@ -116,8 +123,6 @@ export const getStaticProps = async ({ params: { slug } }) => {
 
   const product = await client.fetch(query)
   const products = await client.fetch(productsQuery)
-
-  console.log(product)
 
   return {
     props: {
